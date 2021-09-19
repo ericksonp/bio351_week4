@@ -1,0 +1,276 @@
+---
+title: "Bio 351 Lab Week 5: Wild fly data analysis; KEY"
+output: html_notebook
+---
+
+Due date: In lab or by  Friday, September 24th, 4:00 PM
+
+#Part 1: Individual data
+
+Welcome to your second R lab. Today we'll practice some data manipulation, basic statistics, and plotting skills to look at our fly collection numbers. You'll also practice writing figure legends and results paragarphs.
+
+First we'll load the packages we need for data analysis and plotting
+```{r, message=F}
+library(data.table)
+library(ggplot2)
+library(rmarkdown)
+```
+
+
+Your data are saved in the week 4 repository folder called `fieldtrip.csv`. Now look back at your code from week 1 to remind yourself of the command to load data from a csv file. Then import your fly data table as an object named `data`. I know it is annoying to flip back and forth, but you will actually remember this better if you are forced to find and apply the information yourself rather than just blindly running code that I prepare for you!
+
+```{r}
+#load data here
+```
+
+Now use R to create a new column called "total" that has the total number of flies you collected and identified in each vial (hint: in the week 1 lab we created a column called "nObs" in a similar way). You could have done this in Excel or Google Sheets, but doing it programmatically in R provides a record of exactly how it was calculated and an easy way to recalculate if you discover an error in the raw data.
+
+```{r}
+#calculate total here
+```
+# Part 1: Analyze your group's data
+
+Next, we'll pull out just the data for your group to do a preliminary analysis on your data. Complete the code below to create a new object that just has the rows containing your data and name it "mydata". (Hint, you'll need to use an "==" symbol to find the rows of data that you want; you can find similar examples in the work from week 1)
+
+```{r}
+#isolate your group's data here
+```
+
+Now we need to make a table called `group.totals` that sums all of your net vials and aspirator vials together.This uses some R trickery that we won't go into right now, but we are essentially just adding together the counts in any rows that that have the same method ("net" or "asp"). 
+
+```{r}
+group.totals<-mydata[,lapply(.SD, sum, na.rm=TRUE), by=Method, .SDcols=c("Zind", "Dmel", "Dhyd", "Dsuz", "otherD", "total")] 
+```
+***Question*** Look at the `group.totals` object. How is it different from your raw data?
+
+***Answer here***
+
+Next, let's test if your overall sampling was different between the netting and aspirating using a chi-square test. To conduct this test, we need to first isolate only the cells of our data table that have our species count data in it. To pull out only certain columns of a data table, we use the format:
+`tablename[,c(names of columns you want to isolate separated by commas)]`
+For example:
+`mydata[,c(Location, Method)]` would produce a table containing just two columns and all of the rows in the original mydata table
+
+Use this approach to conduct a chi-square test on the columns of `group.totals` containing your fly count data of each species (but not the "total" column; we only want to look at the individual species counts). The commmand for a chisquare test is `chisquaretest(data table)`
+
+```{r}
+#first work out the command that will isolate only the count data from your mydata object
+
+
+#now run a chi-square test on that isolated data
+
+
+```
+
+***Question*** Interpret the results of your Chi-Square test. 1) What was the null hypothesis and 2) what does the test result tell us? Please answer in full sentences.
+
+***Answer here***
+
+Now let's visualize that test by creating a bar graph showing the number of flies falling in each category for each collection method in your data.  
+
+First we need to re-arrange the data into a "long" format, so that there is only one column that contains numbers that we care about. We'll use the "melt" function like we did in week 1.
+
+```{r}
+mydata.melt<-melt(group.totals, idvars=c("Method", "total"),measure.vars=c("Zind", "Dmel", "Dhyd", "Dsuz", "otherD")) 
+```
+
+**Question** Describe the new `mydata.melt` data table. What is different about it from `mydata`? 
+
+**Answer Here** 
+
+**Question** Based on your answer above, explain what the "idvars" and "measure.vars" arguments of the `melt` function above are doing. If you are stuck, try typing ??melt into the Console below and read the help documentation that pops up in the lower right window.
+
+**Answer Here** 
+
+Let's rename the two new columns with the `set.names()` function. The usage of this function is `setnames(data_table_name, "old column name", "new column name")`. The column names, both old and new, need to be in quotation marks.
+
+```{r}
+ # example: this renames "variable" to "species"
+setnames(mydata.melt, "variable", "species")
+
+##now type code below to rename "value" to "count"
+
+
+```
+
+Now use the comments below to help you complete the code for the graph. Remember that we are trying to compare the counts of flies that were netted or aspirated for each species in a bar graph. Think about what variables should go on the x and y axis to make an informative plot.
+
+```{r}
+ggplot(mydata.melt)+ #this line just tells R that we are making a plot using data in mydata.melt. The "+" says that more information about the plot is coming in the next line
+  
+  geom_bar(aes(x= , #what do you want on the x axis
+               y=  , #what do you want on the y axis
+               fill=  ), #this is going to create different colored bars for the categories. What categorical variable do you want to compare for each individual species?
+           position="dodge", stat="identity") #this code is just giving some information about how we want to arrange the plot. "dodge" tells it to make side-by-side bars for each category, and "identity" tells it to plot the total number rather than the number of times the data occurs
+  
+```
+***Question*** Interpret this plot in light of your chi-square analysis above. What trends in the data seem to have led to your chi-square result?
+
+***Answer here***
+
+
+***Question*** Why might it be more appropriate to plot proportion data rather than count data? (Hint: what would the plot look like if you collected many times more flies in one method than the other?)
+ 
+ ***Answer here***
+
+
+Let's remake the plot showing proportions instead. You can actually just do this calculation within the plot command, by adding a division sign to the y argument (divide by previous y value by the total number of individuals)
+
+Copy your code from the last plot here and edit it to plot the proportion instead. Additionally, look at the information found at https://ggplot2.tidyverse.org/reference/labs.html and find out how change the y axis label to a more descriptive title. There are lots of useful sources of documentation for R packages, so the internet (and Google especially!) is a great resource when you need to find out how to do something specific. You must successfully change the y-axis label to earn credit for this lab.
+
+```{r}
+#copy your code from above here, change it to plot proportions, and add a y-axis label
+  
+```
+
+
+***Question*** Write an appropriate figure legend for this figure, calling it "Figure 1". Remember from Bio 200/202 that figure legends should begin with the Figure name and follow with a descriptive title. The text should then include a brief description of key experimental methods, explain any abbreviations used in labels, and provide any other information necessary to interpret the data. Someone should have a basic understanding of what was done after reading the figure legend.
+
+***Answer here ***
+
+
+
+#Part 2: Class data
+
+Now remember that the big picture purpose of the lab was to determine whether we sample similar species using nets and aspirators. Your individual group data was one datapoint, but we have replication across groups. Since our focal species is Zaprionus, let's test whether, as class, we found a significant differences in the proportion of Zaprionus collected in nets versus aspirators. 
+ 
+To look at this dataset, we need to do several things:
+1) total up the counts by group and method (we are going to use group as our unit of replication since our sample sizes are fairly low and some individuals didn't get flies in nets and aspirators)
+2) Convert counts into a proportion Zaprionus
+3) Calculate summary statistics (mean and standard error) and make a plot
+4) Use a T-test to see whether there is a significant difference in the proportions calculated between nets and aspirators
+
+Now we are going to use a nifty feature of the data.table package to summarize data across all rows that share one or more characteristics that we want to group by. Here we'll be grouping by method and group.
+
+The format of this calculation has 3 elements inside square brackets: read the syntax below
+`data_table_name[rows_to_use, .(new columns to calculate separated by commas), .(categories to group by separated by commas)]`. 
+Here we are using all rows, so we leave a blank before the first comma, then we are using the sum() function to add up the total number of flies, and finally grouping by the collection method and group of people. 
+
+```{r}
+data.sum<-data[, .(zap.total=sum(Zind, na.rm=T), total.total=sum(total, na.rm=T)), .(Method,Group)] 
+data.sum
+```
+
+Look at your data.sum table
+
+***Question*** What do we have in this new table? What are the zap.total and total.total columns and how are they calculated?
+
+***Answer here***
+
+Calculate  new column called "prop.zap" in your data.sum table that has the percentage of Zaprionus relative to the total number of flies for each group and method. You might need to refer back to earlier work to remember the syntax for generating a new column.
+
+```{r}
+#calculate proportion here
+```
+
+***Question*** How do sample sizes compare between groups, and what influence might that have on our results?
+
+***Answer here***
+
+While we have our data organized like this, let's go ahead and make a plot comparing the proportions between methods. First, we are going to use the same basic tool as above, but now we are going to calculate the mean proportion of Zaprionus for each method, averaged across all groups.
+
+```{r}
+data.sum2<-data.sum[, .(mean.proportion=mean(prop.zap, na.rm=T), std.dev=sd(prop.zap, na.rm=T)), .(Method)]
+data.sum2
+```
+***Question*** What did the `.(Method)` at the end of the previous command do?
+
+***Answer here***
+
+***Question*** Explain the new columns that we have calculated
+
+***Answer here***
+
+Now let's plot the data in our `data.sum2` table. You will need to add in the x and y values to the code below and add an appropriate y-axis label 
+
+```{r}
+#complete the x and y variables in the plot code below and a
+ggplot(data.sum2)+geom_bar(aes(x= , #what should be on the x-axis?
+                              y=  ),  #what should be on the y-axis?
+                           stat="identity")+
+                geom_errorbar(aes(x= Method, ymax=mean.proportion+std.dev, ymin=mean.proportion-std.dev)) #geom_errorbar will add errorbars that span from a specified minimum to maximum value
+                            
+```
+***Question*** based on your plot, is there a substantial difference between netting and aspirating? Your answer should include a reference to the error bars.
+
+
+***Answer here***
+
+
+***Question*** Write a figure legend for this plot, calling it "Figure 2". Use the same general format as described for Figure 1 above. Someone should have a general understanding of what was done after reading the figure legend.
+
+***Answer here***
+
+To do the t-test, we need to rearrange the data so that the values we are directly comparing are side by side. We are going to use the `dcast` function to turn our long data table into a wide data table.
+
+```{r}
+data.wide<-dcast(data.sum,Group~Method, value.var="prop.zap" )
+data.wide
+```
+
+**Question ** Look at data.wide. What did we do?
+
+**Answer here**
+
+
+You can look at an individual column of a data.table using the `$` symbol. Data_table_name$column_name will give you a "vector" of all the values in the column, which is essentially each of the values in order from the top of the table to the bottom of the table
+
+Try it below
+```{r}
+data.wide$asp
+data.wide$net
+```
+
+Last step! Now that we know how to isolate columns, we can do a paired T.test. In a paired-test, we are looking at paired values of data that were collected together to see if there is a difference in means between the two categories. Our data are paired because each group was collecting in a different area of the orchard, so the values for nets and aspirators have a biological link between them. The null hypothesis of the paired t test is that the difference in means between groups is zero.
+
+The syntax for the t.test is `t.test(first vector of values, second vector of values, paired=T)`
+
+Using the information from the previous code chunk and the formula above, complete the code below
+
+```{r}
+#t-test goes here
+```
+
+***Question*** Interpret your paired T-test. What is your result with respect to the null hypothesis? What does it mean biologically?
+
+***Answer here***
+
+#Part 3: multi-year data
+
+For the final part of the lab, we are going to compare the collection from this year to the collections from previous years at the same orchard. There is a second data file called "HPO.csv" in the folder that has previous fly data collected from Hanover Peach Orchard along with our total class data for the sampling point in 2021. Load that file in now and save it as an object called `hpo` and print it below. This will be "Table 1" for our results.
+
+```{r}
+#load table
+
+#print table here:
+
+```
+***Question*** Give an appropriate title for this table. The title should convey the key information about the data presented in the table.
+
+***Answer here***
+
+***Question*** Based on Table 1, how does this year's result compare to previous data collected at the orchard? Please answer in full sentences.
+
+***Answer here***
+
+Making plots that involve dates is a bit complicated in R, so for the sake of time we are not going to graph the data. 
+
+***Question*** Describe a graph that might effectively portray the data in the `hpo` data table. What would be on the x and y axis? How might you use color coding, lines, or symbols to portray the data? Please answer in full sentences
+
+***Answer here***
+
+#Final task
+
+Your final task for this lab is to write a results paragraph that summarizes your data. You should address three points:
+1) Your individual data (Figure 1 + statistics)
+2) The class data (Figure 2 + statistics)
+3) The comparison of class data to other years (Table 1)
+Remember from Bio 200/202 the following points about writing results:
+1) You should begin the paragraph with a sentence describing the purpose or question addressed by the experiment/analysis.
+2) You should summarize key results and present statistics supporting your analysis
+3) You should refer to all figures and tables parenthetically
+4) You should use effective transition statements to guide the reader through the logic of the experiments and analysis
+5) Results paragraphs are limited in how much they interpret the data. They should factually summarize the results without applying too much context or interpretation (that interpretation and context is more appropriate for a discussion paragraph )
+
+***Question*** Write your results paragraph below. It will be graded for the quality of writing as well as the accuracy of the statements and its adherence to standard scientific format for reporting results, as outlined above.
+
+***Answer here ***
