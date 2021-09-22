@@ -1,5 +1,5 @@
 ---
-title: "Bio 351 Lab Week 5: Wild fly data analysis; KEY"
+title: "Bio 351 Lab Week 5: Wild fly data analysis"
 output: html_notebook
 ---
 
@@ -50,7 +50,7 @@ Next, let's test if your overall sampling was different between the netting and 
 For example:
 `mydata[,c(Location, Method)]` would produce a table containing just two columns and all of the rows in the original mydata table
 
-Use this approach to conduct a chi-square test on the columns of `group.totals` containing your fly count data of each species (but not the "total" column; we only want to look at the individual species counts). The commmand for a chisquare test is `chisquaretest(data table)`
+Use this approach to conduct a chi-square test on the columns of `group.totals` containing your fly count data of each species (but not the "total" column; we only want to look at the individual species counts). The commmand for a chisquare test is `chisq.test(data table to use)`
 
 ```{r}
 #first work out the command that will isolate only the count data from your mydata object
@@ -248,13 +248,13 @@ For the final part of the lab, we are going to compare the collection from this 
 
 ***Answer here***
 
-***Question*** Based on Table 1, how does this year's result compare to previous data collected at the orchard? Please answer in full sentences.
+***Question*** Based on Table 1, how does this year's result compare to previous data collected at the orchard? You are going to need to use the "next" button above to see all the rows, including this year's data. Please answer in full sentences.
 
 ***Answer here***
 
 Making plots that involve dates is a bit complicated in R, so for the sake of time we are not going to graph the data. 
 
-***Question*** Describe a graph that might effectively portray the data in the `hpo` data table. What would be on the x and y axis? How might you use color coding, lines, or symbols to portray the data? Please answer in full sentences
+***Question*** Describe a graph that might effectively portray the data in the `hpo` data table. What would be on the x and y axis? How might you use color coding, lines, or symbols to portray the data? Please answer in full sentences.
 
 ***Answer here***
 
